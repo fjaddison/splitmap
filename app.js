@@ -114,3 +114,142 @@ buttons.forEach(b => {
     })
 })
 
+// https://github.com/Montoya/bunny-hold/blob/main/docs/view.html
+
+// Unpkg imports
+const Web3Modal = window.Web3Modal.default;
+const WalletConnectProvider = window.WalletConnectProvider.default;
+const evmChains = window.evmChains;
+
+// Web3modal instance
+let web3Modal;
+
+// Chosen wallet provider given by the dialog window
+let provider;
+
+
+// Address of the selected account
+let selectedAccount;
+
+// Contracts
+let bunnyContract;
+
+function init() {
+    // Check that the web page is run in a secure context,
+    // as otherwise MetaMask won't be available
+    if(location.protocol !== 'https:') {
+        // https://ethereum.stackexchange.com/a/62217/620
+        alert("This will not work unless the website is served on https")
+        return
+    }
+
+    // Tell Web3modal what providers we have available.
+    // Built-in web browser provider (only one can exist as a time)
+    // like MetaMask, Brave or Opera is added automatically by Web3modal
+    const providerOptions = {
+        walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+            infuraId: 'e863eafb372342c4848530b42d99556d',
+            }
+        }
+    }
+
+    web3Modal = new Web3Modal({
+        cacheProvider: false, // optional
+        providerOptions, // required
+        disableInjectedProvider: false, // optional. For MetaMask / Brave / Opera.
+        theme: 'dark',
+    });
+    
+    console.log("Web3Modal instance is", web3Modal)
+}
+
+/*
+    Kick in the UI action after Web3modal dialog has chosen a provider
+*/
+async function fetchAccountData() {
+
+    // document.getElementById('loading').style.display = 'none';
+
+    // Get a Web3 instance for the wallet
+    const web3 = new Web3(provider)
+
+    console.log("Web3 instance is", web3)
+
+    // Get connected chain id from Ethereum node
+    const chainId = await web3.eth.getChainId()
+    // Load chain information over an HTTP API
+    const chainData = evmChains.getChain(chainId)
+    console.log('Connected chain is: '+chainData.name)
+
+    // Get list of accounts of the connected wallet
+    const accounts = await web3.eth.getAccounts()
+
+    // MetaMask does not give you all accounts, only the selected account
+    console.log("Got accounts", accounts)
+    selectedAccount = accounts[0]
+
+}
+
+/**
+ * Fetch account data for UI when
+ * - User switches accounts in wallet
+ * - User switches networks in wallet
+ * - User connects wallet initially
+ */
+async function refreshAccountData() {
+  await fetchAccountData(provider)
+}
+
+/**
+ * Connect wallet button pressed.
+ */
+async function onConnect() {
+
+    console.log("Opening a dialog", web3Modal)
+    try {
+    provider = await web3Modal.connectTo('walletconnect')
+    } catch(e) {
+    console.log("Could not get a wallet connection", e)
+    return
+    }
+
+    // Subscribe to accounts change
+    provider.on("accountsChanged", accounts => {
+    fetchAccountData();
+    })
+
+    // Subscribe to chainId change
+    provider.on("chainChanged", chainId => {
+    fetchAccountData();
+    })
+
+    // Subscribe to networkId change
+    provider.on("networkChanged", networkId => {
+    fetchAccountData();
+    })
+
+    await refreshAccountData()
+}
+
+window.addEventListener('load', async () => {
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    if (typeof web3 !== 'undefined') {
+        // Use Mist/MetaMask's provider
+        web3js = new Web3(Web3.currentProvider)
+        console.log(Web3.currentProvider)
+    } else {
+        // console.log(web3)
+        // Handle the case where the user doesn't have Metamask installed
+        // Probably show them a message prompting them to install Metamask
+        alert('no web3 provider. try installing MetaMask')
+    }
+
+    init()
+    // adds event listener to connect-wallet button to call OnConnect function
+    document.querySelector('.wallet-connect-btn').addEventListener('click', e => {
+        e.preventDefault()
+        onConnect()
+    })
+})
