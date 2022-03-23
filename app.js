@@ -272,9 +272,9 @@ window.addEventListener('load', async () => {
     init()
     let connect = document.querySelector('#connect')
     let disconnect = document.querySelector('#disconnect')
-    connect.addEventListener('click', e => {
+    connect.addEventListener('click', async e => {
         // e.preventDefault()
-        onConnect()
+        await onConnect()
         if (typeof(selectedAccount) == 'string') {
             connect.style.display = 'none'
             disconnect.style.display = 'flex'
