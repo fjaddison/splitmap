@@ -213,7 +213,7 @@ async function refreshAccountData() {
 *   create instance of blitmap contract and read some data
 */
 function connectToBlitmap() {
-    const web3 = new Web3(provider)
+    const web3 = new Web3('https://rinkeby.infura.io/v3/e863eafb372342c4848530b42d99556d')
     blitmapContract = new web3.eth.Contract(blitmapInterface, blitmapAddress)
     blitmapContract.methods.tokenNameOf(0).call().then((res) => {
         console.log(res)
