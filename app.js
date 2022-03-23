@@ -233,6 +233,33 @@ async function onConnect() {
     await refreshAccountData()
 }
 
+
+/**
+* Disconnect wallet button pressed.
+*/
+async function onDisconnect() {
+
+    console.log("Killing the wallet connection", provider)
+  
+    // TODO: Which providers have close method?
+    if(provider.close) {
+      await provider.close()
+  
+      // If the cached provider is not cleared,
+      // WalletConnect will default to the existing session
+      // and does not allow to re-scan the QR code with a new wallet.
+      // Depending on your use case you may want or want not his behavior.
+      await web3Modal.clearCachedProvider()
+      provider = null
+    }
+  
+    selectedAccount = null
+  
+    // Set the UI back to the initial state
+    document.querySelector("#prepare").style.display = "block"
+    document.querySelector("#connected").style.display = "none"
+}
+
 window.addEventListener('load', async () => {
     // Checking if Web3 has been injected by the browser (Mist/MetaMask)
     if (typeof web3 !== 'undefined') {
@@ -247,9 +274,18 @@ window.addEventListener('load', async () => {
     }
 
     init()
-    // adds event listener to connect-wallet button to call OnConnect function
-    document.querySelector('.wallet-connect-btn').addEventListener('click', e => {
-        e.preventDefault()
+    let connect = document.querySelector('#connect')
+    let disconnect = document.querySelector('#disconnect')
+    connect.addEventListener('click', e => {
+        // e.preventDefault()
         onConnect()
+        connect.style.display = 'none'
+        disconnect.style.display = 'flex'
+    })
+    disconnect.addEventListener('click', e => { 
+        // e.preventDefault()
+        onDisconnect()
+        disconnect.style.display = 'none'
+        connect.style.display = 'flex'
     })
 })
