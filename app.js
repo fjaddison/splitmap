@@ -214,7 +214,7 @@ async function refreshAccountData() {
 */
 function connectToBlitmap() {
     const web3 = new Web3(provider)
-    blitmapContract = web3.eth.Contract(blitmapInterface, blitmapAddress)
+    blitmapContract = new web3.eth.Contract(blitmapInterface, blitmapAddress)
     blitmapContract.methods.tokenNameOf(0).call().then((res) => {
         console.log(res)
     }).catch(err => {
