@@ -18,6 +18,10 @@ h3, p, .mint-btn {
     font-family: 'Inconsolata', monospace;
 }
 
+#disconnect {
+    display: none;
+}
+
 .wallet-connect-btn {
     width: 160px;
     height: 40px;
