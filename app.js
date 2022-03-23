@@ -275,8 +275,10 @@ window.addEventListener('load', async () => {
     connect.addEventListener('click', e => {
         // e.preventDefault()
         onConnect()
-        connect.style.display = 'none'
-        disconnect.style.display = 'flex'
+        if (accounts.length > 0) {
+            connect.style.display = 'none'
+            disconnect.style.display = 'flex'
+        }
     })
     disconnect.addEventListener('click', e => { 
         // e.preventDefault()
