@@ -254,10 +254,6 @@ async function onDisconnect() {
     }
   
     selectedAccount = null
-  
-    // Set the UI back to the initial state
-    document.querySelector("#prepare").style.display = "block"
-    document.querySelector("#connected").style.display = "none"
 }
 
 window.addEventListener('load', async () => {
