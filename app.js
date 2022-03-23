@@ -275,7 +275,7 @@ window.addEventListener('load', async () => {
     connect.addEventListener('click', e => {
         // e.preventDefault()
         onConnect()
-        if (accounts.length > 0) {
+        if (selectedAccount != undefined && selectedAccount != null) {
             connect.style.display = 'none'
             disconnect.style.display = 'flex'
         }
