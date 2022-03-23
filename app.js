@@ -117,22 +117,24 @@ buttons.forEach(b => {
 // https://github.com/Montoya/bunny-hold/blob/main/docs/view.html
 
 // Unpkg imports
-const Web3Modal = window.Web3Modal.default;
-const WalletConnectProvider = window.WalletConnectProvider.default;
-const evmChains = window.evmChains;
+const Web3Modal = window.Web3Modal.default
+const WalletConnectProvider = window.WalletConnectProvider.default
+const evmChains = window.evmChains
 
 // Web3modal instance
-let web3Modal;
+let web3Modal
 
 // Chosen wallet provider given by the dialog window
-let provider;
-
+let provider
 
 // Address of the selected account
-let selectedAccount;
+let selectedAccount
+
+// address of deployed blitmap contract
+var blitmapAddress = '0xe31d202b3C14a30f6d89719A629DFa5803174756'
 
 // Contracts
-let bunnyContract;
+let blitmapContract
 
 function init() {
     // Check that the web page is run in a secure context,
@@ -205,6 +207,19 @@ async function fetchAccountData() {
  */
 async function refreshAccountData() {
   await fetchAccountData(provider)
+}
+
+/* 
+*   create instance of blitmap contract and read some data
+*/
+function connectToBlitmap() {
+    const web3 = new Web3(provider)
+    blitmapContract = web3.eth.Conract(blitmapInterface, blitmapAddress)
+    blitmapContract.methods.tokenNameOf(0).call().then((res) => {
+        console.log(res)
+    }).catch(err => {
+        console.error(err)
+    })
 }
 
 /**
@@ -291,4 +306,5 @@ window.addEventListener('load', async () => {
         disconnect.style.display = 'none'
         connect.style.display = 'flex'
     })
+    connectToBlitmap()
 })
