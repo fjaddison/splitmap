@@ -150,6 +150,7 @@ function init() {
         walletconnect: {
             package: WalletConnectProvider,
             options: {
+            network: 'rinkeby',
             infuraId: 'e863eafb372342c4848530b42d99556d',
             }
         }
