@@ -185,9 +185,13 @@ async function fetchAccountData() {
 
     // Get list of accounts of the connected wallet
     const accounts = await web3.eth.getAccounts()
+    
+    // Get balance of first account in accounts array
+    let balance = await web3.eth.getBalance(accounts[0])
 
     // MetaMask does not give you all accounts, only the selected account
     console.log("Got accounts", accounts)
+    console.log(`Welcome ${accounts[0].substr(0, 5)}. Current balance: ${balance}`)
     selectedAccount = accounts[0]
 
 }
