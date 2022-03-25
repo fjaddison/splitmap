@@ -46,44 +46,55 @@ document.addEventListener('drop', e => {
     }
 })
 
-for (i = 0; i < 100; i++) {
-    let containerChild = document.createElement('div')
-    containerChild.classList.add('container-element')
-    container.appendChild(containerChild)
-    handleChildImage(containerChild)
-    let containerInfo = document.createElement('div')
-    containerInfo.classList.add('container-info')
-    containerChild.appendChild(containerInfo)
-    handleChildTitleArtist(containerInfo)
-    handleSlabs(containerInfo)
-    handleAffinity(containerInfo)
-    handleMintBtn(containerInfo)
+function makeBlits() {
+    for (i = 0; i < ogBlits.length; i++) {
+        let blit = ogBlits[i]
+        let containerChild = document.createElement('div')
+        containerChild.classList.add('container-element')
+        container.appendChild(containerChild)
+        handleChildImage(containerChild, blit.image, blit.name)
+        let containerInfo = document.createElement('div')
+        containerInfo.classList.add('container-info')
+        containerChild.appendChild(containerInfo)
+        handleChildTitleArtist(containerInfo, blit.name, blit.artist)
+        handleSlabs(containerInfo, blit.attributes[1], blit.data)
+        handleAffinity(containerInfo, blit.attributes[0])
+        handleMintBtn(containerInfo)
+    }
 }
 
-function handleChildImage(el) {
+function handleChildImage(el, url, name) {
     let img = document.createElement('img')
     img.classList.add('container-image')
-    img.src = 'gen.png'
-    img.alt = 'genesis blitmap'
+    img.src = url
+    img.alt = `${name} blitmap`
     el.appendChild(img)
 }
 
-function handleChildTitleArtist(el) {
+function handleChildTitleArtist(el, name, artist) {
     let containerTitleArtist = document.createElement('div')
     let containerTitle = document.createElement('p')
     let containerArtist = document.createElement('p')
     containerTitle.classList.add('card-title')
-    containerTitle.innerHTML = '"Genesis"'
-    containerArtist.innerHTML = 'by dom'
+    let splitString = name.split(' ')
+    let cleanedName = []
+    for (j = 0; j < splitString.length; j++) {
+        if (j > 1) {
+            cleanedName.push(splitString[j])
+        }
+    }
+    containerTitle.innerHTML = `"${cleanedName.join(' ')}"`
+    containerArtist.innerHTML = `by ${artist}`
     el.appendChild(containerTitleArtist)
     containerTitleArtist.appendChild(containerTitle)
     containerTitleArtist.appendChild(containerArtist)
 }
 
-function handleSlabs(el) {
+function handleSlabs(el, slabs, data) {
     let slabContainer = document.createElement('div')
-    let slabs = [['&#9698;', '#000000'], ['&#9699;', '#0600ff'], ['&#9698;', '#d5719e'], ['&#9698;', '#fff568']]
-    slabs.forEach(s => {
+    let fetchedSlabs = slabs.value.split(' ')
+    let slabList = [[fetchedSlabs[0], '#' + data.substr(2, 6)], [fetchedSlabs[1], '#' + data.substr(8, 6)], [fetchedSlabs[2], '#' + data.substr(14, 6)], [fetchedSlabs[3], '#' + data.substr(20, 6)]]
+    slabList.forEach(s => {
         let slabSpan = document.createElement('span')
         slabSpan.innerHTML = s[0]
         slabSpan.style = `color: ${s[1]}; padding: 0 3px;`
@@ -92,9 +103,9 @@ function handleSlabs(el) {
     el.appendChild(slabContainer)
 }
 
-function handleAffinity(el) {
+function handleAffinity(el, aff) {
     let affinity = document.createElement('p')
-    affinity.innerHTML = 'Water III'
+    affinity.innerHTML = aff.value
     el.appendChild(affinity)
 }
 
@@ -307,4 +318,10 @@ window.addEventListener('load', async () => {
         connect.style.display = 'flex'
     })
     connectToBlitmap()
+    let loading = document.createElement('div')
+    loading.id = 'loading'
+    loading.innerHTML = 'Loading...'
+    container.appendChild(loading)
+    await makeBlits()
+    container.removeChild(container.firstChild)
 })
